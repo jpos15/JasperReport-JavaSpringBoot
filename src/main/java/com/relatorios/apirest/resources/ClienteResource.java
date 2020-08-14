@@ -1,5 +1,6 @@
 package com.relatorios.apirest.resources;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.relatorios.apirest.models.Cliente;
 import com.relatorios.apirest.repository.ClienteRepository;
+import com.relatorios.apirest.service.ReportService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.sf.jasperreports.engine.JRException;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -27,6 +30,8 @@ public class ClienteResource {
 	
 	@Autowired
 	ClienteRepository clienteRepository;
+	@Autowired
+	private ReportService reportService;
 	
 	@GetMapping("/clientes")
 	@ApiOperation(value = "Retorna uma lista de clientes")
@@ -46,15 +51,25 @@ public class ClienteResource {
 		return clienteRepository.save(cliente);
 	}
 	
-	@DeleteMapping("cliente")
+	@DeleteMapping("/cliente")
 	@ApiOperation(value = "Atualiza um cliente")
 	public void excluirCliente(@RequestBody Cliente cliente) {
 		clienteRepository.delete(cliente);
 	}
 	
-	@PutMapping("cliente")
+	@PutMapping("/cliente")
 	@ApiOperation(value = "Atualiza um cliente")
 	public Cliente atualizarCliente(@RequestBody Cliente cliente) {
 		return clienteRepository.save(cliente);
+	}
+	
+	@GetMapping("/report/{format}")
+	public String gerenateReport(@PathVariable String format) throws FileNotFoundException, JRException {
+		return reportService.exportReport(format);
+	}
+
+	@PostMapping("/json")
+	public void json(@RequestBody List<Object> lista) throws FileNotFoundException, JRException {
+		reportService.recebeJson(lista);
 	}
 }
