@@ -1,9 +1,21 @@
 package com.relatorios.apirest.resources;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Handler;
 
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +32,9 @@ import com.relatorios.apirest.service.ReportService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import net.sf.jasperreports.engine.JRException;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -69,7 +83,13 @@ public class ClienteResource {
 	}
 
 	@PostMapping("/json")
-	public void json(@RequestBody List<Object> lista) throws FileNotFoundException, JRException {
-		reportService.recebeJson(lista);
+	public Object json(@RequestBody List<Object> lista, HttpServletResponse response) throws IOException, JRException {
+		byte[] bytes = reportService.recebeJson(lista);
+		System.out.println(bytes);
+		String encodedString = Base64.getEncoder().encodeToString(bytes);
+		System.out.println(encodedString);
+
+		Object retorno = encodedString;
+		return retorno;
 	}
 }
